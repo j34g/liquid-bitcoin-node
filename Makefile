@@ -8,11 +8,11 @@ all: prepare build
 
 # Preparation step, calling prepare.sh
 prepare:
-	./prepare.sh  # <--- Use tabs here, not spaces
+	./prepare.sh
 
 # Build step using start-sdk
 build:
-	start-sdk pack  # <--- Use tabs here, not spaces
+	start-sdk pack
 
 # Clean up old build files
 clean:
@@ -21,4 +21,4 @@ clean:
 
 # Verify the package
 verify:
-	start-sdk verify $(S9PK_NAME).s9pk  # <--- Use tabs here, not spaces
+	start-sdk verify $(S9PK_NAME).s9pk
