@@ -1,0 +1,120 @@
+id: liquid-bitcoin-node
+title: Liquid Bitcoin Node
+version: 1.0.0
+description:
+  short: "A Liquid sidechain node for Bitcoin."
+  long: |
+    Liquid is a Bitcoin sidechain developed by Blockstream. It enables faster transactions, confidential assets, and multi-asset support. This service allows users to run a Liquid Bitcoin Node (elementsd) in Liquid mode, facilitating access to the Liquid network for secure Bitcoin transactions.
+release-notes: |
+  - Initial release of Liquid Bitcoin Node for StartOS.
+license: MIT
+wrapper-repo: "https://github.com/yourrepo/liquid-bitcoin-node-wrapper"
+upstream-repo: "https://github.com/ElementsProject/elements"
+support-site: "https://support.liquid.network"
+marketing-site: "https://liquid.net"
+build:
+  - "make"
+min-os-version: 0.3.5
+assets:
+  license: "LICENSE"
+  icon: "icon.png"
+  instructions: "instructions.md"
+  docker-images: "docker-images/x86_64.tar"
+main:
+  type: docker
+  image: blockstream/elementsd:latest
+  entrypoint: "docker-entrypoint.sh"
+  args:
+    - "elementsd"
+    - "-chain=liquidv1"
+  mounts:
+    - type: volume
+      name: liquid-data
+      path: /root/.elements
+health-checks:
+  main:
+    name: Liquid P2P Check
+    description: "Checks if Liquid node is running and reachable on P2P port."
+    type: docker
+    image: blockstream/elementsd:latest
+    entrypoint: "elements-cli"
+    args:
+      - "getnetworkinfo"
+    inject: true
+    system: false
+    io-format: json
+config:
+  get:
+    type: docker
+    image: blockstream/elementsd:latest
+    system: false
+    entrypoint: "elements-cli"
+    args:
+      - "getconfig"
+    io-format: json
+  set:
+    type: docker
+    image: blockstream/elementsd:latest
+    system: false
+    entrypoint: "elements-cli"
+    args:
+      - "setconfig"
+    io-format: json
+dependencies: {}
+volumes:
+  liquid-data:
+    type: data
+interfaces:
+  main:
+    name: Liquid P2P Interface
+    description: "Exposes the Liquid P2P port over the network."
+    tor-config:
+      port-mapping:
+        7041: "7041"
+    lan-config:
+      7041:
+        ssl: false
+        internal: 7041
+    ui: false
+    protocols:
+      - tcp
+alerts:
+  install-alert: "Liquid Bitcoin Node is installing. This may take a few minutes."
+  uninstall-alert: "Liquid Bitcoin Node has been uninstalled."
+  restore-alert: "Restoring Liquid Bitcoin Node backup."
+  start-alert: "Liquid Bitcoin Node is starting."
+backup:
+  create:
+    type: docker
+    image: blockstream/elementsd:latest
+    system: false
+    entrypoint: "elements-cli"
+    args:
+      - "backup"
+    mounts:
+      BACKUP: "/backup"
+      main: "/root/.elements"
+  restore:
+    type: docker
+    image: blockstream/elementsd:latest
+    system: false
+    entrypoint: "elements-cli"
+    args:
+      - "restore"
+    mounts:
+      BACKUP: "/backup"
+      main: "/root/.elements"
+actions:
+  restart-node:
+    name: "Restart Liquid Node"
+    description: "Restarts the Liquid Bitcoin node."
+    allowed-statuses:
+      - "running"
+      - "stopped"
+    implementation:
+      type: docker
+      image: blockstream/elementsd:latest
+      entrypoint: "elements-cli"
+      args:
+        - "stop"
+        - "start"

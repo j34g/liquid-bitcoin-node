@@ -1,0 +1,13 @@
+# Ignore Docker images
+docker-images/
+
+# Ignore log files
+*.log
+
+# Ignore temporary files
+*.tmp
+
+# Ignore environment files
+.env
+
+
