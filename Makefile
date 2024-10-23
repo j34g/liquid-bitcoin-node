@@ -17,7 +17,7 @@ verify: $(PKG_ID).s9pk
 	@echo " Done!"
 	@echo "   Filesize: $(shell du -h $(PKG_ID).s9pk) is ready"
 
-$(PKG_ID).s9pk: manifest.yaml docker-images/x86_64.tar instructions.md
+$(PKG_ID).s9pk: manifest.yaml docker-images/x86_64.tar instructions.md icon.png LICENSE
 	@echo "start-sdk: Preparing package ..."
 	@start-sdk pack
 
